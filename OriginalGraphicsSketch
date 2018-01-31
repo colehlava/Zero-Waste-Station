@@ -1,0 +1,68 @@
+from tkinter import *
+from tkinter import ttk, Canvas, Frame, BOTH
+import tkinter as tk
+import sys
+
+def close(event):
+    master.withdraw() # if you want to bring it back
+    sys.exit() # if you want to exit the entire thing
+
+def frac(n): return 360. * n / 360
+root = Tk()
+
+mainframe = ttk.Frame(root, padding="3 100 12 12")
+mainframe.grid(column=0, row=0,sticky=(N, W, E, S))
+mainframe.columnconfigure(0, weight=1)
+mainframe.rowconfigure(0, weight=1)
+
+image = tk.PhotoImage(file="2592x1944.png")
+image = image.subsample(8,8)
+
+#image2 = tk.PhotoImage(file="piechart.png")
+#image2 = image2.subsample(2,2)
+
+ttk.Label(mainframe,image=image).grid(column=2,row=2, sticky= (W, E))
+#ttk.Label(mainframe,image=image2).grid(column=1,row=1,rowspan=4,padx=35, sticky= (W, E))
+
+c = Canvas(mainframe, bg='linen', width=340, height=600)
+coord = 100,100,210,210
+c.create_arc((320,320,20,20), fill="red", start=frac(0), extent = frac(90))
+c.create_arc((320,320,20,20), fill="blue", start=frac(90), extent = frac(90))
+c.create_arc((320,320,20,20), fill="green", start=frac(180), extent = frac(90))
+c.create_arc((320,320,20,20), fill="yellow", start=frac(270), extent = frac(90))
+
+c.grid(column=1,row=1,rowspan=4,padx=15, sticky= (W, E))
+
+
+ttk.Label(mainframe,text="Materials acceptable by stream").grid(column=2, row=1,sticky=W)
+
+ttk.Label(mainframe,image=image).grid(column=2,row=2, sticky= (W, E))
+ttk.Label(mainframe,image=image).grid(column=3,row=2, sticky= (W, E))
+ttk.Label(mainframe,image=image).grid(column=4,row=2, sticky= (W, E))
+ttk.Label(mainframe,image=image).grid(column=5,row=2, sticky= (W, E))
+
+ttk.Label(mainframe,text="Live Cam").grid(column=2, row=3,sticky=W)
+
+ttk.Label(mainframe,image=image).grid(column=2,row=4, sticky= (W, E))
+ttk.Label(mainframe,image=image).grid(column=3,row=4, sticky= (W, E))
+ttk.Label(mainframe,image=image).grid(column=4,row=4, sticky= (W, E))
+ttk.Label(mainframe,image=image).grid(column=5,row=4, sticky= (W, E))
+
+ttk.Label(mainframe,text="Live Weight").grid(column=1, row=6,padx=120,pady=35,sticky=W)
+ttk.Label(mainframe,text="Containers").grid(column=2, row=6,padx=120,pady=35,sticky=W)
+ttk.Label(mainframe,text="Paper").grid(column=3, row=6,padx=120,pady=35,sticky=W)
+ttk.Label(mainframe,text="Compost").grid(column=4, row=6,padx=120,pady=35,sticky=W)
+ttk.Label(mainframe,text="Landfill").grid(column=5, row=6,padx=120,pady=35,sticky=W)
+
+ttk.Label(mainframe,text="18 lbs").grid(column=2, row=7,padx=120,pady=0,sticky=W)
+ttk.Label(mainframe,text="22 lbs").grid(column=3, row=7,padx=120,pady=0,sticky=W)
+ttk.Label(mainframe,text="31 lbs").grid(column=4, row=7,padx=120,pady=0,sticky=W)
+ttk.Label(mainframe,text="6 lbs").grid(column=5, row=7,padx=120,pady=0,sticky=W)
+
+
+
+#root.overrideredirect(True)
+root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
+root.focus_set()  # <-- move focus to this widget
+root.bind('<Escape>', sys.exit())
+root.mainloop()
