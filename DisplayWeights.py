@@ -15,7 +15,7 @@ count = 0
 
 try:
 
-        labels = 'scale 1', 'scale 2', 'scale 3', 'scale 4'
+        labels = ['scale 1', 'scale 2', 'scale 3', 'scale 4']
         sizes = [scale1, scale2, scale3, scale4]
         colors = ['grey', 'b', 'g', 'k']
         explode = (0.1, 0, 0, 0)
@@ -28,7 +28,7 @@ try:
                 data = ser.readline() # read data from Arduino
 
                 sizes = data.split(',')
-                """
+                
                 if count > 0:
                         scale1 = sizes[0]
                         scale2 = sizes[1]
@@ -40,15 +40,14 @@ try:
                 scale3 = float(scale3)
                 scale4 = float(scale4)
 
-		sizes[0] = scale1
-		sizes[1] = scale2
-		sizes[2] = scale3
-		sizes[3] = scale4
+				sizes[0] = scale1
+				sizes[1] = scale2
+				sizes[2] = scale3
+				sizes[3] = scale4
 
                 ax.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-
                 count += 1
-        """
+        
         ani = FuncAnimation(fig, update, frames=range(100), repeat=False)
         plt.show()
 
@@ -60,7 +59,6 @@ except KeyboardInterrupt:
 try:
 	while True:
 		data = ser.readline() # read data from Arduino
-
 		# interpret data for scale 1
 		if data.startswith('a'):
 			data = data.replace('a', "")
@@ -69,7 +67,6 @@ try:
 			scale1 = float(data)
 			#print("scale 1: ")
 			#print(scale1)
-
 		# interpret data for scale 2
 		if data.startswith('b'):
 			data = data.replace('b', "")
@@ -78,7 +75,6 @@ try:
 			scale2 = float(data)
 			#print("scale 2: ")
 			#print(scale2)
-
 		# interpret data for scale 3
 		if data.startswith('c'):
 			data = data.replace('c', "")
@@ -87,7 +83,6 @@ try:
 			scale3 = float(data)
 			#print("scale 3: ")
 			#print(scale3)
-
 		# interpret data for scale 4
 		if data.startswith('d'):
 			data = data.replace('d', "")
@@ -96,14 +91,11 @@ try:
 			scale4 = float(data)
 			#print("scale 4: ")
 			#print(scale4)
-
 		#print("\n")
-
                 labels = 'scale 1', 'scale 2', 'scale 3', 'scale 4'
                 sizes = [scale1, scale2, scale3, scale4]
                 colors = ['grey', 'b', 'g', 'k']
                 explode = (0.1, 0, 0, 0)
-
                 fig = plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=0)
                 plt.axis('equal')
                 plt.legend()
@@ -114,5 +106,4 @@ try:
 	
 except KeyboardInterrupt:
 	ser.close()
-
-"""   
+"""  
