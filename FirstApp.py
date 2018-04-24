@@ -5,11 +5,10 @@ matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 from matplotlib import style
-
 import tkinter as tk
 from tkinter import ttk
-
 import serial
 
 ser = serial.Serial('/dev/ttyS0',9600,timeout=1)
@@ -17,19 +16,21 @@ ser = serial.Serial('/dev/ttyS0',9600,timeout=1)
 LARGE_FONT = ("Verdana", 12)
 style.use("ggplot")
 
-f = Figure(figsize=(5,5), dpi=100)
-a = f.add_subplot(111)
+f, a = plt.subplots()
+plt.suptitle('Where does our trash go?')
 labels = ['Paper', 'Cans & Bottles', 'Compost', 'Landfill']
 colors = ['grey', 'b', 'g', 'saddlebrown']
-explode = (0, 0, 0, 0.1)
+explode = (0, 0, 0, 0)
+
 
 def animate(i):
     a.clear()
     a.axis('equal')
-    #sizes = [0,0,0,0]
+    data = []
+    sizes = []
 
     data = ser.readline()  # read data from Arduino
-    sizes = data.split(',')
+    sizes = data.split(b',')
 
     scale1 = sizes[0]
     scale2 = sizes[1]
@@ -81,9 +82,6 @@ class FirstApp(tk.Tk):
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
-
-def qf(param):
-    print(param)
     
 class StartPage(tk.Frame):
     
@@ -145,19 +143,12 @@ class PageThree(tk.Frame):
                             command=lambda: controller.show_frame(StartPage))
         button1.pack()
 
-        #f = Figure(figsize=(5,5), dpi=100)
-        #a = f.add_subplot(111)
-        #a.plot([1,2,3,4,5,6,7,8], [5,6,1,3,8,9,3,5])
-
         canvas = FigureCanvasTkAgg(f, self)
         canvas.show()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
-        toolbar = NavigationToolbar2TkAgg(canvas, self)
-        toolbar.update()
         canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
 
 app = FirstApp()
-ani = animation.FuncAnimation(f, animate, interval=1000)
+ani = animation.FuncAnimation(f, animate, interval=200)
 app.mainloop()
