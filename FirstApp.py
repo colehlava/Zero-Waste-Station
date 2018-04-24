@@ -1,4 +1,5 @@
 # FirstApp.py
+# Author: Cole Hlava
 
 import matplotlib
 matplotlib.use("TkAgg")
@@ -10,6 +11,7 @@ from matplotlib import style
 import tkinter as tk
 from tkinter import ttk
 import serial
+from PIL import Image, ImageTk
 
 ser = serial.Serial('/dev/ttyS0',9600,timeout=1)
 
@@ -17,7 +19,7 @@ LARGE_FONT = ("Verdana", 12)
 style.use("ggplot")
 
 f, a = plt.subplots()
-plt.suptitle('Where does our trash go?')
+plt.suptitle('What portion of waste gets\nsent to the landfill?', fontsize=26, fontweight='bold', color='green')
 labels = ['Paper', 'Cans & Bottles', 'Compost', 'Landfill']
 colors = ['grey', 'b', 'g', 'saddlebrown']
 explode = (0, 0, 0, 0)
@@ -36,7 +38,7 @@ def animate(i):
     scale2 = sizes[1]
     scale3 = sizes[2]
     scale4 = sizes[3]
-		
+
     scale1 = float(scale1)
     scale2 = float(scale2)
     scale3 = float(scale3)
@@ -90,17 +92,17 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
-        button1 = ttk.Button(self, text="Visit Page One",
-                            command=lambda: controller.show_frame(PageOne))
+        button1 = ttk.Button(self, text="Visit Page One", command=lambda: controller.show_frame(PageOne))
         button1.pack()
 
-        button2 = ttk.Button(self, text="Visit Page Two",
-                            command=lambda: controller.show_frame(PageTwo))
+        button2 = ttk.Button(self, text="Visit Page Two", command=lambda: controller.show_frame(PageTwo))
         button2.pack()
 
-        button3 = ttk.Button(self, text="Visit Graph Page",
-                            command=lambda: controller.show_frame(PageThree))
+        button3 = ttk.Button(self, text="Visit Graph Page", command=lambda: controller.show_frame(PageThree))
         button3.pack()
+
+        button4 = ttk.Button(self, text="Exit", command=quit)
+        button4.pack()
 
 class PageOne(tk.Frame):
 
@@ -109,12 +111,10 @@ class PageOne(tk.Frame):
         label = tk.Label(self, text="Page One", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
-        button1 = ttk.Button(self, text="Back to Home",
-                            command=lambda: controller.show_frame(StartPage))
+        button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage))
         button1.pack()
 
-        button2 = ttk.Button(self, text="Visit Page Two",
-                            command=lambda: controller.show_frame(PageTwo))
+        button2 = ttk.Button(self, text="Visit Page Two", command=lambda: controller.show_frame(PageTwo))
         button2.pack()
 
 class PageTwo(tk.Frame):
@@ -124,29 +124,36 @@ class PageTwo(tk.Frame):
         label = tk.Label(self, text="Page Two", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
-        button1 = ttk.Button(self, text="Back to Home",
-                            command=lambda: controller.show_frame(StartPage))
+        button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage))
         button1.pack()
 
-        button2 = ttk.Button(self, text="Visit Page One",
-                            command=lambda: controller.show_frame(PageOne))
+        button2 = ttk.Button(self, text="Visit Page One", command=lambda: controller.show_frame(PageOne))
         button2.pack()
 
 class PageThree(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Graph Page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
+        label1 = tk.Label(self, text="Graph Page", font=LARGE_FONT)
+        label1.pack(pady=10, padx=10)
 
-        button1 = ttk.Button(self, text="Back to Home",
-                            command=lambda: controller.show_frame(StartPage))
+        button1 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(StartPage))
         button1.pack()
 
         canvas = FigureCanvasTkAgg(f, self)
         canvas.show()
-        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        #canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        #canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.Y)
+        canvas._tkcanvas.pack(side=tk.LEFT, fill=tk.Y)
+
+        c = tk.Canvas(self, bg="green", width=1300, height=900)
+        c.pack(side=tk.RIGHT, fill=tk.Y)
+
+        """im = Image.open("/home/pi/Documents/ZeroWasteStation/capture_3.jpg")
+        c.image = ImageTk.PhotoImage(im)
+        c.create_image(0, 0, image=c.image, anchor='nw')"""
+
 
 
 app = FirstApp()
