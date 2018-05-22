@@ -14,9 +14,8 @@ import serial
 
 ser = serial.Serial('/dev/ttyS0', 9600, timeout=1)
 
-LARGE_FONT = ("Arial", 12)
-TITLE_FONT = ("Arial", 25)
-MAIN_FONT = ("Times New Roman", 50)
+MESSAGE_FONT = ("Times New Roman", 25)
+LARGE_FONT = ("Times New Roman", 50)
 style.use("ggplot")
 matplotlib.rcParams['font.size'] = 20.0
 
@@ -26,16 +25,53 @@ colors = ['grey', 'b', 'g', 'saddlebrown']
 explode = (0, 0, 0, 0)
 
 
+def updateLabel():
+    d = []
+    s = []
+    d = ser.readline()  # read data from Arduino
+    s = d.split(b',')
+
+    scale1 = s[0]
+    scale2 = s[1]
+    scale3 = s[2]
+    scale4 = s[3]
+
+    scale1 = float(scale1)
+    scale2 = float(scale2)
+    scale3 = float(scale3)
+    scale4 = float(scale4)
+
+    if scale1 <= 0:
+        scale1 = scale1 * -1
+    if scale2 <= 0:
+        scale2 = scale2 * -1
+    if scale3 <= 0:
+        scale3 = scale3 * -1
+    if scale4 <= 0:
+        scale4 = scale4 * -1
+
+    total = int(scale1 + scale2 + scale3 + scale4)
+
+    if(total == 0):
+        divRate = "100"
+    else:
+        cleanWaste = scale1 + scale2 + scale3
+        div = cleanWaste / total
+        div = int(div * 100)
+        divRate = str(div)
+    
+    label11.configure(text=""+divRate+"%")
 
 
 def animate(i):
+    updateLabel()
     a.clear()
     a.axis('equal')
     f.suptitle('Interactive Zero Waste Station', size=55, color='green')
     a.set_title('Distribution of Materials', size=25)
+    
     data = []
     sizes = []
-
     data = ser.readline()  # read data from Arduino
     sizes = data.split(b',')
 
@@ -48,7 +84,6 @@ def animate(i):
     scale2 = float(scale2)
     scale3 = float(scale3)
     scale4 = float(scale4)
-    total = scale1 + scale2 + scale3 + scale4
 
     if scale1 <= 0:
         scale1 = scale1 * -1
@@ -58,18 +93,13 @@ def animate(i):
         scale3 = scale3 * -1
     if scale4 <= 0:
         scale4 = scale4 * -1
-
+    
     sizes[0] = scale1
     sizes[1] = scale2
     sizes[2] = scale3
     sizes[3] = scale4
 
     a.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-    
-    if(total == 0):
-        return 0
-    
-    return scale4 / total
     
 
 class FirstApp(tk.Tk):
@@ -78,7 +108,7 @@ class FirstApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self, "Zero Waste Station")
 
-        #self.attributes('-fullscreen', True)
+        self.attributes('-fullscreen', True) # uncomment for fullscreen mode
         
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -124,13 +154,18 @@ class GraphPage(tk.Frame):
         canvas.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         canvas._tkcanvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        #button1 = ttk.Button(self, text="Exit Program", command=quit)
-        #button1.pack()
+        m = tk.Message(self, font=MESSAGE_FONT, width=400, text="The University of California has a goal to reach zero waste by 2020. Achieving zero waste is defined as diverting at least 90% of discarded materials (by weight) from the landfill. This station was designed to help reach our goal of zero waste by 2020 by emphasizing where materials go after they have been thrown away.", bg='white')
+        m.pack()
 
-        tv = "hey there"
+        label1 = tk.Label(self, font=MESSAGE_FONT, text="\n\nThe current diversion rate is:", bg='white', fg='blue')
+        label1.pack(fill=tk.X)
+        
+        global label11
+        label11 = tk.Label(self, font=LARGE_FONT, text="", bg='white')
+        label11.pack(fill=tk.BOTH)
 
-        label1 = tk.Label(self, text=tv)
-        label1.pack()
+        label2 = tk.Label(self, text="", bg='white')
+        label2.pack(fill=tk.BOTH, expand=True)
 
 
 
