@@ -48,34 +48,42 @@ def animate(i):
     
     data = []
     sizes = []
-    data = ser.readline()  # read data from Arduino
-    sizes = data.split(b',')
+    adjustFactor = 1
+    data = ser.readline()   # read data from Arduino
+    sizes = data.split(b',') # split data into list of individual scale readings
 
     scale1 = sizes[0]
     scale2 = sizes[1]
     scale3 = sizes[2]
     scale4 = sizes[3]
 
-    scale1 = float(scale1)
+    scale1 = float(scale1)  # convert readings from strings to floats
     scale2 = float(scale2)
     scale3 = float(scale3)
     scale4 = float(scale4)
 
-    total = scale1 + scale2 + scale3 + scale4
+    if scale1 < 0:          # handle negative readings
+        scale1 = scale1 * -1
+    if scale2 < 0:
+        scale2 = scale2 * -1
+    if scale3 < 0:
+        scale3 = scale3 * -1
+    if scale4 < 0:
+        scale4 = scale4 * -1
+
+    scale1 = scale1 - 7.3   # adjust for weight of trash bins
+    scale2 = scale2 - 7.3
+    scale3 = scale3 - 7.3
+    scale4 = scale4 - 7.3
     
-    if total < 8:
-        adjustFactor = 2
-    else:
-        adjustFactor = total / 4
-    
-    if scale1 < 1:
-        scale1 = scale1 + adjustFactor
+    if scale1 < 1:          # handle values that are too small to graph
+        scale1 = adjustFactor
     if scale2 < 1:
-        scale2 = scale2 + adjustFactor
+        scale2 = adjustFactor
     if scale3 < 1:
-        scale3 = scale3 + adjustFactor
+        scale3 = adjustFactor
     if scale4 < 1:
-        scale4 = scale4 + adjustFactor
+        scale4 = adjustFactor
 
     sizes[0] = scale1
     sizes[1] = scale2
@@ -152,5 +160,5 @@ class GraphPage(tk.Frame):
 
 
 app = FirstApp()
-ani = animation.FuncAnimation(f, animate, interval=333)
+ani = animation.FuncAnimation(f, animate, interval=450)
 app.mainloop()
