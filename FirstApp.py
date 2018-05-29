@@ -1,4 +1,5 @@
 # FirstApp.py
+# Controls Zero Waste Station
 # Author: Cole Hlava
 
 import matplotlib
@@ -25,46 +26,21 @@ colors = ['grey', 'b', 'g', 'saddlebrown']
 explode = (0, 0, 0, 0)
 
 
-def updateLabel():
-    d = []
-    s = []
-    d = ser.readline()  # read data from Arduino
-    s = d.split(b',')
+def updateDivRate(sizes):
+    total = int(sizes[0] + sizes[1] + sizes[2] +sizes[3])
 
-    scale1 = s[0]
-    scale2 = s[1]
-    scale3 = s[2]
-    scale4 = s[3]
-
-    scale1 = float(scale1)
-    scale2 = float(scale2)
-    scale3 = float(scale3)
-    scale4 = float(scale4)
-
-    if scale1 <= 0:
-        scale1 = scale1 * -1
-    if scale2 <= 0:
-        scale2 = scale2 * -1
-    if scale3 <= 0:
-        scale3 = scale3 * -1
-    if scale4 <= 0:
-        scale4 = scale4 * -1
-
-    total = int(scale1 + scale2 + scale3 + scale4)
-
-    if(total == 0):
+    if total == 0:
         divRate = "100"
     else:
-        cleanWaste = scale1 + scale2 + scale3
+        cleanWaste = int(sizes[0] + sizes[1] + sizes[2])
         div = cleanWaste / total
         div = int(div * 100)
         divRate = str(div)
     
-    label11.configure(text=""+divRate+"%")
+    label11.configure(text=divRate+"%")
 
 
 def animate(i):
-    updateLabel()
     a.clear()
     a.axis('equal')
     f.suptitle('Interactive Zero Waste Station', size=55, color='green')
@@ -85,22 +61,31 @@ def animate(i):
     scale3 = float(scale3)
     scale4 = float(scale4)
 
-    if scale1 <= 0:
-        scale1 = scale1 * -1
-    if scale2 <= 0:
-        scale2 = scale2 * -1
-    if scale3 <= 0:
-        scale3 = scale3 * -1
-    if scale4 <= 0:
-        scale4 = scale4 * -1
+    total = scale1 + scale2 + scale3 + scale4
     
+    if total < 8:
+        adjustFactor = 2
+    else:
+        adjustFactor = total / 4
+    
+    if scale1 < 1:
+        scale1 = scale1 + adjustFactor
+    if scale2 < 1:
+        scale2 = scale2 + adjustFactor
+    if scale3 < 1:
+        scale3 = scale3 + adjustFactor
+    if scale4 < 1:
+        scale4 = scale4 + adjustFactor
+
     sizes[0] = scale1
     sizes[1] = scale2
     sizes[2] = scale3
     sizes[3] = scale4
 
     a.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-    
+
+    updateDivRate(sizes)
+
 
 class FirstApp(tk.Tk):
     
@@ -108,7 +93,7 @@ class FirstApp(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         tk.Tk.wm_title(self, "Zero Waste Station")
 
-        self.attributes('-fullscreen', True) # uncomment for fullscreen mode
+        #self.attributes('-fullscreen', True) # comment out to disable fullscreen mode
         
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -140,9 +125,6 @@ class StartPage(tk.Frame):
         button3 = ttk.Button(self, text="Visit Graph Page", command=lambda: controller.show_frame(GraphPage))
         button3.pack()
 
-        button4 = ttk.Button(self, text="Exit", command=quit)
-        button4.pack()
-
 
 class GraphPage(tk.Frame):
 
@@ -170,5 +152,5 @@ class GraphPage(tk.Frame):
 
 
 app = FirstApp()
-ani = animation.FuncAnimation(f, animate, interval=220)
+ani = animation.FuncAnimation(f, animate, interval=333)
 app.mainloop()
