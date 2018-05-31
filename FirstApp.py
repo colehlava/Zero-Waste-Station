@@ -26,18 +26,27 @@ colors = ['grey', 'b', 'g', 'saddlebrown']
 explode = (0, 0, 0, 0)
 
 
-def updateDivRate(sizes):
-    total = int(sizes[0] + sizes[1] + sizes[2] +sizes[3])
+def updateLabels(sizes):
+    total = sizes[0] + sizes[1] + sizes[2] + sizes[3] # calculate total weight of materials
+    paper = str(int(sizes[0])) # convert values from floats to ints to strings
+    cans = str(int(sizes[1]))
+    compost = str(int(sizes[2]))
+    landfill = str(int(sizes[3]))
 
-    if total == 0:
+    if total == 0:          # ensures no division by 0
         divRate = "100"
     else:
-        cleanWaste = int(sizes[0] + sizes[1] + sizes[2])
+        cleanWaste = sizes[0] + sizes[1] + sizes[2]
         div = cleanWaste / total
         div = int(div * 100)
         divRate = str(div)
-    
-    label11.configure(text=divRate+"%")
+
+    # update values on labels
+    divLabel.configure(text=divRate+"%")
+    paperLabel.configure(text="\nPaper: "+paper+" lbs")
+    canLabel.configure(text="Cans/Bottles: "+cans+" lbs")
+    compostLabel.configure(text="Compost: "+compost+" lbs")
+    landfillLabel.configure(text="Landfill: "+landfill+" lbs")
 
 
 def animate(i):
@@ -45,10 +54,10 @@ def animate(i):
     a.axis('equal')
     f.suptitle('Interactive Zero Waste Station', size=55, color='green')
     a.set_title('Distribution of Materials', size=25)
-    
+
+    adjustFactor = 1
     data = []
     sizes = []
-    adjustFactor = 1
     data = ser.readline()   # read data from Arduino
     sizes = data.split(b',') # split data into list of individual scale readings
 
@@ -85,14 +94,14 @@ def animate(i):
     if scale4 < 1:
         scale4 = adjustFactor
 
-    sizes[0] = scale1
+    sizes[0] = scale1       # store values back into list
     sizes[1] = scale2
     sizes[2] = scale3
     sizes[3] = scale4
 
-    a.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+    a.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140) # plot
 
-    updateDivRate(sizes)
+    updateLabels(sizes)    # update diversion rate and material weights
 
 
 class FirstApp(tk.Tk):
@@ -127,11 +136,8 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         
-        label = tk.Label(self, text="Start Page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
-        button3 = ttk.Button(self, text="Visit Graph Page", command=lambda: controller.show_frame(GraphPage))
-        button3.pack()
+        #label = tk.Label(self, text="Start Page", font=LARGE_FONT)
+        #label.pack(pady=10, padx=10)
 
 
 class GraphPage(tk.Frame):
@@ -145,20 +151,33 @@ class GraphPage(tk.Frame):
         canvas._tkcanvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         m = tk.Message(self, font=MESSAGE_FONT, width=400, text="The University of California has a goal to reach zero waste by 2020. Achieving zero waste is defined as diverting at least 90% of discarded materials (by weight) from the landfill. This station was designed to help reach our goal of zero waste by 2020 by emphasizing where materials go after they have been thrown away.", bg='white')
-        m.pack()
+        m.pack(fill=tk.X)
 
-        label1 = tk.Label(self, font=MESSAGE_FONT, text="\n\nThe current diversion rate is:", bg='white', fg='blue')
+        label1 = tk.Label(self, font=MESSAGE_FONT, text="\n\nThe current diversion rate is:", bg='white', fg='cadet blue')
         label1.pack(fill=tk.X)
         
-        global label11
-        label11 = tk.Label(self, font=LARGE_FONT, text="", bg='white')
-        label11.pack(fill=tk.BOTH)
+        global divLabel
+        divLabel = tk.Label(self, font=LARGE_FONT, text="", bg='white', fg='cadet blue')
+        divLabel.pack(fill=tk.X)
 
-        label2 = tk.Label(self, text="", bg='white')
-        label2.pack(fill=tk.BOTH, expand=True)
+        global paperLabel
+        paperLabel = tk.Label(self, font=LARGE_FONT, text="", bg='white', fg='grey')
+        paperLabel.pack(fill=tk.X)
+
+        global canLabel
+        canLabel = tk.Label(self, font=LARGE_FONT, text="", bg='white', fg='blue')
+        canLabel.pack(fill=tk.X)
+
+        global compostLabel
+        compostLabel = tk.Label(self, font=LARGE_FONT, text="", bg='white', fg='green')
+        compostLabel.pack(fill=tk.X)
+
+        global landfillLabel
+        landfillLabel = tk.Label(self, font=LARGE_FONT, text="", bg='white', fg='saddlebrown')
+        landfillLabel.pack(fill=tk.BOTH)
 
 
 
 app = FirstApp()
-ani = animation.FuncAnimation(f, animate, interval=450)
+ani = animation.FuncAnimation(f, animate, interval=600)
 app.mainloop()
